@@ -154,63 +154,58 @@
         const GEMINI_API_KEY = CONFIG.GEMINI_API_KEY;
 
 
-        async function transformTextWithAI() {
-            const input = document.getElementById('inputText').value;
-            const tone = document.getElementById('toneSelect').value;
-            const language = document.getElementById('langSelect').value;
+    async function transformTextWithAI() {
+        const input = document.getElementById('inputText').value;
+        const tone = document.getElementById('toneSelect').value;
+        const language = document.getElementById('langSelect').value;
 
-            if (!input.trim()) {
-                alert('Please enter your thoughts first!');
-                return;
-            }
-
-            const btn = document.getElementById('generateBtn');
-            const outputSec = document.getElementById('outputSection');
-            const outputText = document.getElementById('outputText');
-
-            // Set UI Loading State
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Crafting response...`;
-            btn.disabled = true;
-
-            // Strict Prompt Engineering for Best Output
-            const systemPrompt = `You are a professional email & communication assistant. 
-Rephrase, improve, and format the user's input according to these rules:
-- Target Tone: ${tone}
-- Target Output Language: ${language}
-- Formatting: Output ONLY the polished, final ready-to-send message. Do not add conversational filler like "Here is your email:". Keep formatting clean with proper line breaks.
-
-User Input:
-"${input}"`;
-
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: systemPrompt }]
-                        }]
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const resultText = data.candidates[0].content.parts[0].text.trim();
-                    outputText.innerText = resultText;
-                    outputSec.classList.remove('hidden');
-                } else {
-                    alert('Error generating text. Please check your API key or try again.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to connect to AI server. Please try again.');
-            } finally {
-                // Restore Button State
-                btn.innerHTML = `<i class="fa-solid fa-bolt text-amber-300"></i> <span>Transform Text Now</span>`;
-                btn.disabled = false;
-            }
+        if (!input.trim()) {
+            alert('Please enter your thoughts first!');
+            return;
         }
+
+        const btn = document.getElementById('generateBtn');
+        const outputSec = document.getElementById('outputSection');
+        const outputText = document.getElementById('outputText');
+
+        // Set UI Loading State
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Crafting response...`;
+        btn.disabled = true;
+
+        const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
+
+        try {
+            // استخدام خدمة مجانية عامة كمثال للتجربة
+            const response = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-base", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ inputs: promptText })
+            });
+
+            const data = await response.json();
+            
+            // التحقق من النتيجة وطباعتها
+            if (data && data[0] && data[0].generated_text) {
+                outputText.innerText = data[0].generated_text.trim();
+                outputSec.classList.remove('hidden');
+            } else if (Array.isArray(data) && data.length > 0) {
+                outputText.innerText = JSON.stringify(data);
+                outputSec.classList.remove('hidden');
+            } else {
+                // محاولة بديلة أو رسالة توضيحية إذا كان النموذج يجهز نفسه (Loading state)
+                outputText.innerText = data.error || "Model is loading, please try again in a few seconds.";
+                outputSec.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to connect to free AI server. Please try again.');
+        } finally {
+            btn.innerHTML = `<i class="fa-solid fa-bolt text-amber-300"></i> <span>Transform Text Now</span>`;
+            btn.disabled = false;
+        }
+    }
 
         // Attach function to button click
         document.getElementById('generateBtn').onclick = transformTextWithAI;
