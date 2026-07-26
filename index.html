@@ -174,36 +174,33 @@
 
         const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
 
-        try {
-            // استخدام خدمة مجانية عامة كمثال للتجربة
-            const response = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-base", {
+    try {
+            const response = await fetch("https://api-inference.huggingface.co/models/gpt2", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": "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"
                 },
                 body: JSON.stringify({ inputs: promptText })
             });
 
             const data = await response.json();
             
-            // التحقق من النتيجة وطباعتها
             if (data && data[0] && data[0].generated_text) {
-                outputText.innerText = data[0].generated_text.trim();
-                outputSec.classList.remove('hidden');
-            } else if (Array.isArray(data) && data.length > 0) {
-                outputText.innerText = JSON.stringify(data);
+                // تنظيف النص الناتج ليعرض الرسالة فقط بدون تكرار المدخلات القديمة
+                let result = data[0].generated_text;
+                if (result.includes(promptText)) {
+                    result = result.replace(promptText, "").trim();
+                }
+                outputText.innerText = result || data[0].generated_text.trim();
                 outputSec.classList.remove('hidden');
             } else {
-                // محاولة بديلة أو رسالة توضيحية إذا كان النموذج يجهز نفسه (Loading state)
-                outputText.innerText = data.error || "Model is loading, please try again in a few seconds.";
+                outputText.innerText = "Model is warming up or processing. Please try again in a moment.";
                 outputSec.classList.remove('hidden');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to connect to free AI server. Please try again.');
-        } finally {
-            btn.innerHTML = `<i class="fa-solid fa-bolt text-amber-300"></i> <span>Transform Text Now</span>`;
-            btn.disabled = false;
+            alert('Failed to connect to AI server. Please try again.');
         }
     }
 
