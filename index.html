@@ -140,7 +140,7 @@
     </footer>
 
     <script>
-        function saveToken() {
+function saveToken() {
             const token = document.getElementById('apiKeyInput').value.trim();
             if (token) {
                 localStorage.setItem('gemini_user_api_key', token);
@@ -176,14 +176,15 @@
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
             
-            // استخدام نموذج Gemini 1.5 Flash السريع والمجاني والمستقرار عبر الـ API الرسمي
-            const modelURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            // استخدام النموذج المحدث والمستقر حالياً عبر الـ API
+            const modelURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
 
             try {
                 const response = await fetch(modelURL, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "X-goog-api-key": apiKey
                     },
                     body: JSON.stringify({
                         contents: [
