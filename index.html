@@ -140,7 +140,7 @@
     </footer>
 
 <script>
-        function saveToken() {
+function saveToken() {
             const token = document.getElementById('hfTokenInput').value.trim();
             if (token) {
                 localStorage.setItem('hf_user_token', token);
@@ -150,7 +150,7 @@
             }
         }
 
-async function transformTextWithAI() {
+        async function transformTextWithAI() {
             const hfToken = localStorage.getItem('hf_user_token');
             
             if (!hfToken) {
@@ -175,8 +175,6 @@ async function transformTextWithAI() {
             btn.disabled = true;
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
-            
-            // Corrected router endpoint with /hf-inference/ included
             const modelURL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
 
             try {
@@ -223,7 +221,6 @@ async function transformTextWithAI() {
             }
         }
 
-        
         function copyToClipboard() {
             const text = document.getElementById('outputText').innerText;
             navigator.clipboard.writeText(text);
