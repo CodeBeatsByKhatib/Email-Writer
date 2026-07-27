@@ -150,7 +150,7 @@
             }
         }
 
-        async function transformTextWithAI() {
+async function transformTextWithAI() {
             const hfToken = localStorage.getItem('hf_user_token');
             
             if (!hfToken) {
@@ -176,8 +176,7 @@
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
             
-            // Updated to the new active Hugging Face router endpoint
-            const modelURL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
+            const modelURL = "https://router.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
 
             try {
                 const response = await fetch(modelURL, {
