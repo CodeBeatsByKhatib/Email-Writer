@@ -176,7 +176,8 @@ async function transformTextWithAI() {
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
             
-            const modelURL = "https://router.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+            // Corrected router endpoint with /hf-inference/ included
+            const modelURL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
 
             try {
                 const response = await fetch(modelURL, {
@@ -191,7 +192,14 @@ async function transformTextWithAI() {
                     })
                 });
 
-                const result = await response.json();
+                const responseText = await response.text();
+                let result;
+                
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Server returned non-JSON response: ${responseText}`);
+                }
 
                 if (response.ok && Array.isArray(result) && result[0]?.generated_text) {
                     let finalOutput = result[0].generated_text;
@@ -208,13 +216,14 @@ async function transformTextWithAI() {
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Failed to connect to Hugging Face server.');
+                alert('Failed to connect to Hugging Face server: ' + error.message);
             } finally {
                 btn.innerHTML = `<i class="fa-solid fa-bolt text-amber-300"></i> <span>Transform Text Now</span>`;
                 btn.disabled = false;
             }
         }
 
+        
         function copyToClipboard() {
             const text = document.getElementById('outputText').innerText;
             navigator.clipboard.writeText(text);
