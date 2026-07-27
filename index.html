@@ -175,7 +175,7 @@ function saveToken() {
             btn.disabled = true;
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
-            const modelURL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
+            const modelURL = "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta";
 
             try {
                 const response = await fetch(modelURL, {
