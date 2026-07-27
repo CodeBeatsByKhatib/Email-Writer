@@ -175,7 +175,9 @@ function saveToken() {
             btn.disabled = true;
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
-            const modelURL = "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta";
+            
+            // استخدام نقطة الاتصال الجديدة والمدعومة للدردشة
+            const modelURL = "https://router.huggingface.co/v1/chat/completions";
 
             try {
                 const response = await fetch(modelURL, {
@@ -184,9 +186,12 @@ function saveToken() {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${hfToken}`
                     },
-                    body: JSON.stringify({ 
-                        inputs: promptText,
-                        parameters: { max_new_tokens: 500 }
+                    body: JSON.stringify({
+                        model: "meta-llama/Llama-3-8B-Instruct",
+                        messages: [
+                            { role: "user", content: promptText }
+                        ],
+                        max_tokens: 500
                     })
                 });
 
@@ -199,16 +204,12 @@ function saveToken() {
                     throw new Error(`Server returned non-JSON response: ${responseText}`);
                 }
 
-                if (response.ok && Array.isArray(result) && result[0]?.generated_text) {
-                    let finalOutput = result[0].generated_text;
-                    if (finalOutput.includes(promptText)) {
-                        finalOutput = finalOutput.replace(promptText, '').trim();
-                    }
-                    
+                if (response.ok && result.choices && result.choices[0]?.message?.content) {
+                    const finalOutput = result.choices[0].message.content.trim();
                     outputText.innerText = finalOutput;
                     outputSec.classList.remove('hidden');
                 } else if (result.error) {
-                    alert('Hugging Face Error: ' + result.error);
+                    alert('Hugging Face Error: ' + (result.error.message || result.error));
                 } else {
                     alert('Failed to generate response. Check your token or try again.');
                 }
