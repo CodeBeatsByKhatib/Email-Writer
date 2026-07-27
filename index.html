@@ -139,8 +139,7 @@
         <p>Built with passion by <span class="text-slate-300 font-bold">ToneCraft AI</span> • All rights reserved</p>
     </footer>
 
-<script>
-function saveToken() {
+<script>function saveToken() {
             const token = document.getElementById('hfTokenInput').value.trim();
             if (token) {
                 localStorage.setItem('hf_user_token', token);
@@ -176,7 +175,7 @@ function saveToken() {
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
             
-            // استخدام نقطة الاتصال الجديدة والمدعومة للدردشة
+            // استخدام نموذج Gemma المدعوم بشكل مباشر ومستقر عبر مسار الدردشة
             const modelURL = "https://router.huggingface.co/v1/chat/completions";
 
             try {
@@ -187,7 +186,7 @@ function saveToken() {
                         "Authorization": `Bearer ${hfToken}`
                     },
                     body: JSON.stringify({
-                        model: "meta-llama/Llama-3-8B-Instruct",
+                        model: "google/gemma-2-2b-it",
                         messages: [
                             { role: "user", content: promptText }
                         ],
