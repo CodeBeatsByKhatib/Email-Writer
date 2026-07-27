@@ -139,7 +139,7 @@
         <p>Built with passion by <span class="text-slate-300 font-bold">ToneCraft AI</span> • All rights reserved</p>
     </footer>
 
-    <script>
+<script>
         function saveToken() {
             const token = document.getElementById('hfTokenInput').value.trim();
             if (token) {
@@ -175,7 +175,9 @@
             btn.disabled = true;
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
-            const modelURL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+            
+            // Updated to the new active Hugging Face router endpoint
+            const modelURL = "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
 
             try {
                 const response = await fetch(modelURL, {
