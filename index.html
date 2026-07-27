@@ -75,9 +75,9 @@
         <div class="glass-card rounded-2xl p-4 md:p-6 shadow-2xl space-y-6">
             
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs">
-                <label for="hfTokenInput" class="block text-slate-400 mb-1 font-semibold">Hugging Face API Token (Required for first use):</label>
+                <label for="apiKeyInput" class="block text-slate-400 mb-1 font-semibold">Google AI Studio API Key (Required for first use):</label>
                 <div class="flex gap-2">
-                    <input type="password" id="hfTokenInput" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" 
+                    <input type="password" id="apiKeyInput" placeholder="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" 
                         class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-brand-500">
                     <button onclick="saveToken()" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors">Save</button>
                 </div>
@@ -139,21 +139,22 @@
         <p>Built with passion by <span class="text-slate-300 font-bold">ToneCraft AI</span> • All rights reserved</p>
     </footer>
 
-<script>function saveToken() {
-            const token = document.getElementById('hfTokenInput').value.trim();
+    <script>
+        function saveToken() {
+            const token = document.getElementById('apiKeyInput').value.trim();
             if (token) {
-                localStorage.setItem('hf_user_token', token);
-                alert('Token saved successfully!');
+                localStorage.setItem('gemini_user_api_key', token);
+                alert('API Key saved successfully!');
             } else {
-                alert('Please enter a valid token.');
+                alert('Please enter a valid API key.');
             }
         }
 
         async function transformTextWithAI() {
-            const hfToken = localStorage.getItem('hf_user_token');
+            const apiKey = localStorage.getItem('gemini_user_api_key');
             
-            if (!hfToken) {
-                alert('Please enter and save your Hugging Face API Token first!');
+            if (!apiKey) {
+                alert('Please enter and save your Google AI Studio API Key first!');
                 return;
             }
 
@@ -175,22 +176,23 @@
 
             const promptText = `Rephrase this text to have a ${tone} tone and translate it into ${language}: "${input}"`;
             
-            // استخدام نموذج Gemma المدعوم بشكل مباشر ومستقر عبر مسار الدردشة
-            const modelURL = "https://router.huggingface.co/v1/chat/completions";
+            // استخدام نموذج Gemini 1.5 Flash السريع والمجاني والمستقرار عبر الـ API الرسمي
+            const modelURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             try {
                 const response = await fetch(modelURL, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${hfToken}`
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "google/gemma-2-2b-it",
-                        messages: [
-                            { role: "user", content: promptText }
-                        ],
-                        max_tokens: 500
+                        contents: [
+                            {
+                                parts: [
+                                    { text: promptText }
+                                ]
+                            }
+                        ]
                     })
                 });
 
@@ -203,18 +205,18 @@
                     throw new Error(`Server returned non-JSON response: ${responseText}`);
                 }
 
-                if (response.ok && result.choices && result.choices[0]?.message?.content) {
-                    const finalOutput = result.choices[0].message.content.trim();
+                if (response.ok && result.candidates && result.candidates[0]?.content?.parts?.[0]?.text) {
+                    const finalOutput = result.candidates[0].content.parts[0].text.trim();
                     outputText.innerText = finalOutput;
                     outputSec.classList.remove('hidden');
                 } else if (result.error) {
-                    alert('Hugging Face Error: ' + (result.error.message || result.error));
+                    alert('Gemini API Error: ' + (result.error.message || result.error));
                 } else {
-                    alert('Failed to generate response. Check your token or try again.');
+                    alert('Failed to generate response. Check your API key or try again.');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Failed to connect to Hugging Face server: ' + error.message);
+                alert('Failed to connect to Gemini server: ' + error.message);
             } finally {
                 btn.innerHTML = `<i class="fa-solid fa-bolt text-amber-300"></i> <span>Transform Text Now</span>`;
                 btn.disabled = false;
@@ -230,9 +232,9 @@
         }
 
         window.onload = function() {
-            const savedToken = localStorage.getItem('hf_user_token');
+            const savedToken = localStorage.getItem('gemini_user_api_key');
             if (savedToken) {
-                const tokenInput = document.getElementById('hfTokenInput');
+                const tokenInput = document.getElementById('apiKeyInput');
                 if(tokenInput) tokenInput.value = savedToken;
             }
         };
