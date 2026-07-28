@@ -13,7 +13,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === "/api/generate" && request.method === "POST") {
       const body = await request.json();
-      const MODEL = "gemini-2.5-flash-lite";
+      const MODEL = "gemini-3.5-flash-lite";
 
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent`,
