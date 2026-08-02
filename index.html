@@ -157,19 +157,6 @@
     btn.disabled = true;
     btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Crafting response...`;
 
-    const prompt = `
-You are an expert writing assistant.
-
-Rewrite the following text.
-
-Tone: ${tone}
-Output language: ${language}
-
-Keep the same meaning while improving grammar, clarity and readability.
-
-Text:
-${input}
-`;
 
     try {
         const response = await fetch(
@@ -177,9 +164,7 @@ ${input}
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
+                body: JSON.stringify({ text: input, tone, language })
             }
         );
 
@@ -188,8 +173,6 @@ ${input}
         if (!response.ok) {
             throw new Error(data.error?.message || "Unknown API Error");
         }
-
-        const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!result) {
             throw new Error("No response returned.");
