@@ -12,29 +12,33 @@ export default {
 
     const url = new URL(request.url);
     if (url.pathname === "/api/generate" && request.method === "POST") {
-      const { text, tone, language } = await request.json();
+      const { input, tone, language } = await request.json();
 
-      if (!text || !tone || !language) {
-        return new Response(JSON.stringify({ error: "Missing fields" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        });
-      }
+      const prompt = `
+You are an expert writing assistant.
 
-      const prompt = `You are an expert writing assistant.
+Rewrite the following text into TWO alternative versions.
 
-Rewrite the following text in the tone: ${tone}
+Tone: ${tone}
 Output language: ${language}
 
 Rules:
-- Keep the same meaning, improve grammar, clarity and readability.
-- No spelling mistakes.
-- Plain text only: no markdown, no asterisks, no bullet symbols, no bold/italic formatting.
-- Provide exactly 2 alternative versions.
-- Separate the two versions with a line containing only: -------
+- Fix all grammar and spelling mistakes.
+- Do NOT use asterisks (*), markdown, or any special formatting characters. Plain text only.
+- Keep the same meaning as the original text.
+- Output ONLY the two options, formatted exactly like this:
+
+Option 1:
+<first rewritten version>
+
+---------------
+
+Option 2:
+<second rewritten version>
 
 Text:
-${text}`;
+${input}
+`;
 
       const MODEL = "gemini-3.5-flash-lite";
 

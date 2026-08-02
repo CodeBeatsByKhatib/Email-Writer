@@ -163,7 +163,7 @@ async function transformTextWithAI() {
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: input, tone, language })
+                body: JSON.stringify({ input, tone, language })
             }
         );
 
@@ -179,7 +179,7 @@ async function transformTextWithAI() {
             throw new Error("No response returned.");
         }
 
-        outputText.innerText = result;
+        outputText.innerText = result.trim();
         outputSec.classList.remove("hidden");
 
     } catch (err) {
