@@ -140,7 +140,7 @@
     </footer>
 
     <script>
-        async function transformTextWithAI() {
+async function transformTextWithAI() {
     const input = document.getElementById("inputText").value.trim();
     const tone = document.getElementById("toneSelect").value;
     const language = document.getElementById("langSelect").value;
@@ -157,7 +157,6 @@
     btn.disabled = true;
     btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Crafting response...`;
 
-
     try {
         const response = await fetch(
             "https://emailwriter.mohamadalkhateeb49.workers.dev/api/generate",
@@ -173,6 +172,8 @@
         if (!response.ok) {
             throw new Error(data.error?.message || "Unknown API Error");
         }
+
+        const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!result) {
             throw new Error("No response returned.");
